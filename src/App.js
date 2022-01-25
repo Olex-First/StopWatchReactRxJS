@@ -11,7 +11,7 @@ function App() {
   // Set time on
   useEffect(() => {
     const unsubscribe = new Subject();
-    const observable$ = interval(1000)
+    const observable = interval(1000)
         .pipe(takeUntil(unsubscribe))
         .subscribe(() => {
           if (timerOn) {
@@ -26,12 +26,12 @@ function App() {
   }, [timerOn]);
 
   function Time({ time }) {
-    const format = el => `0${Math.floor(el)}`.slice(-2) //formate each el in timer (00:00:00)
+    const format = el => `0${Math.floor(el)}`.slice(-2) //format each el in timer (00:00:00)
     const h = time / 3600
     const min = (time % 3600) / 60
 
     return (
-        <div>
+        <div className='time'>
           {[h, min, time % 60].map(format).join(':')}
         </div>
     )
@@ -39,21 +39,20 @@ function App() {
 
 
   return (
-      <div >
-
+      <div className="container" >
           <div>
             <Time time={time} />
           </div>
           <div>
             {!timerOn && time === 0 && (
-                <button
+                <button className='btn btn-primary btn-lg'
                     onClick={() => setTimeOn(true)}
                 >
                   Start
                 </button>
             )}
             {(time || timerOn) && (
-                <button
+                <button className='btn btn-primary btn-lg'
                     onClick={function () {
                       setTimeOn(false);
                       setTime(0);
@@ -63,7 +62,7 @@ function App() {
                 </button>
             )}
             {(time || timerOn) &&  (
-                <button
+                <button className='btn btn-primary btn-lg'
                     onDoubleClick={function doubleClick() {
                       setTimeOn(false)
                     }}
@@ -71,13 +70,13 @@ function App() {
                       if(time > 0) {
                         setTimeOn(true)
                       }
-                    }}git
+                    }}
                 >
                   {timerOn ? "Wait" : "Start"}
                 </button>
             )}
             {(time || timerOn)  && (
-                <button onClick={() => setTime(0)}
+                <button className='btn btn-primary btn-lg' onClick={() => setTime(0)}
                         >
                   Reset
                 </button>
