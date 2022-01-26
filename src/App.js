@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -6,12 +6,13 @@ import { takeUntil } from 'rxjs/operators';
 function App() {
   const [time, setTime] = useState(0);
   const [timerOn, setTimeOn] = useState(false);
+  const [isWaitClicked, setIsWaitClicked] = useState(false);
 
 
   // Set time on
   useEffect(() => {
     const unsubscribe = new Subject();
-    const observable = interval(1000)
+    const observable$ = interval(1000)
         .pipe(takeUntil(unsubscribe))
         .subscribe(() => {
           if (timerOn) {
@@ -24,6 +25,15 @@ function App() {
       unsubscribe.complete();
     };
   }, [timerOn]);
+
+    const processingOfWait = useCallback(() => {
+        if (isWaitClicked) {
+            setTimeOn(false);
+        } else if (!isWaitClicked) {
+            setIsWaitClicked(true);
+            setTimeout(() => setIsWaitClicked(false), 300);
+        }
+    }, [isWaitClicked]);
 
   function Time({ time }) {
     const format = el => `0${Math.floor(el)}`.slice(-2) //format each el in timer (00:00:00)
@@ -38,20 +48,22 @@ function App() {
   }
 
 
+
+
   return (
       <div className="container" >
           <div>
             <Time time={time} />
           </div>
           <div>
-            {!timerOn && time === 0 && (
+            {!timerOn && (
                 <button className='btn btn-primary btn-lg'
                     onClick={() => setTimeOn(true)}
                 >
                   Start
                 </button>
             )}
-            {(time || timerOn) && (
+            {timerOn && (
                 <button className='btn btn-primary btn-lg'
                     onClick={function () {
                       setTimeOn(false);
@@ -61,26 +73,17 @@ function App() {
                   Stop
                 </button>
             )}
-            {(time || timerOn) &&  (
-                <button className='btn btn-primary btn-lg'
-                    onDoubleClick={function doubleClick() {
-                      setTimeOn(false)
-                    }}
-                    onClick={function() {
-                      if(time > 0) {
-                        setTimeOn(true)
-                      }
-                    }}
-                >
-                  {timerOn ? "Wait" : "Start"}
-                </button>
-            )}
-            {(time || timerOn)  && (
+              <button
+                  className="btn btn-primary btn-lg"
+                  onClick={processingOfWait}
+              >
+                  wait
+              </button>
+
                 <button className='btn btn-primary btn-lg' onClick={() => setTime(0)}
                         >
                   Reset
                 </button>
-            )}
           </div>
       </div>
   );
